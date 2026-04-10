@@ -29,10 +29,10 @@ This project provides a highly flexible and scalable solution for integrating CA
 
 ## Pin connections
 MCP2515	Arduino UNO Pin	Purpose
-VCC	    5V          Power
-GND	    GND         Common ground
-CS	    D10	        Chip Select
-SCK	    D13	        SPI Clock
-MOSI    D11	        Data → MCP2515
-MISO	  D12	        Data → Arduino
-INT	    D2          (optional)	
+- VCC	    5V          Power
+- GND	    GND         Common ground
+- CS	    D10	        Chip Select
+- SCK	    D13	        SPI Clock
+- MOSI    D11	        Data → MCP2515
+- MISO	  D12	        Data → Arduino
+- INT	    D2          (optional)	
