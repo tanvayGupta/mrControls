@@ -1,0 +1,25 @@
+# Ignore build, install and log files of ros2
+build/
+install/
+log/
+
+# Just incase lol
+.env
+
+# C / compiled files
+*.o
+*.out
+*.exe
+
+# Arduino
+*.hex
+*.bin
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
