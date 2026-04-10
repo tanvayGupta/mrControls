@@ -26,3 +26,13 @@ This project integrates CAN (Controller Area Network), ROS (Robot Operating Syst
 
 ## Conclusion
 This project provides a highly flexible and scalable solution for integrating CAN systems with ROS and Arduino, making it suitable for various applications in robotics and automation.
+
+## Pin connections
+MCP2515	Arduino UNO Pin	Purpose
+VCC	    5V          Power
+GND	    GND         Common ground
+CS	    D10	        Chip Select
+SCK	    D13	        SPI Clock
+MOSI    D11	        Data → MCP2515
+MISO	  D12	        Data → Arduino
+INT	    D2          (optional)	
