@@ -5,6 +5,7 @@
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float32
+from ackermann_msgs.msg import AckermannDriveStamped
 import serial
 
 
@@ -21,8 +22,8 @@ class SteeringNode(Node):
             exit()
 
         self.subscription = self.create_subscription(
-            Float32,
-            '/steering_cmd',
+            AckermannDriveStamped,
+            '/steer',
             self.steering_callback,
             10
         )
@@ -32,15 +33,16 @@ class SteeringNode(Node):
         self.max_angle = 60.0  
 
     def steering_callback(self, msg):
-        angle = msg.data
+        angle_rad = msg.drive.steering_angle
+        angle = angle_rad*180/3.14159
 
         # Clamp angle
         angle = max(min(angle, self.max_angle), -self.max_angle)
 
-        cmd = f"P {angle}\n"
+        cmd = f"P {angle:.2f}\n"
         self.ser.write(cmd.encode())
 
-        self.get_logger().info(f"Sent angle: {angle}")
+        self.get_logger().info(f"Sent angle: {angle:.2f}")
 
 
 def main(args=None):

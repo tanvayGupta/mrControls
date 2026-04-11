@@ -9,10 +9,13 @@ MCP_CAN CAN(CAN_CS);
 #define MOTOR_ID 0x01
 #define CAN_PACKET_SET_POS_SPD 6
 
+// Store last commanded angle
+float target_angle = 0.0;
+
 void setup() {
   Serial.begin(115200);
 
-  // Initialize CAN (MUST be 1 Mbps)
+  // Initialize CAN (1 Mbps, 8 MHz crystal)
   while (CAN.begin(MCP_ANY, CAN_1000KBPS, MCP_8MHZ) != CAN_OK) {
     Serial.println("CAN init fail");
     delay(500);
@@ -27,25 +30,25 @@ void loop() {
 
   // -------- READ SERIAL FROM ROS2 --------
   if (Serial.available()) {
-
     String cmd = Serial.readStringUntil('\n');
 
     Serial.print("Received: ");
-    Serial.println(cmd);   // Debug
+    Serial.println(cmd);
 
     if (cmd.startsWith("P")) {
-
-      float angle = cmd.substring(2).toFloat();
-
-      // Send CAN command
-      setPosVel(angle, 3000, 10000);
+      target_angle = cmd.substring(2).toFloat();
     }
   }
+
+  // -------- CONTINUOUS CONTROL (VERY IMPORTANT) --------
+  setPosVel(target_angle, 8000, 30000);  // stronger + smoother
+
+  delay(20);  // ~50 Hz loop
 }
 
 
 // -------- POSITION + VELOCITY MODE --------
-void setPosVel(float pos_deg = 0, int16_t speed_erpm = 3000, int16_t acc_erpm_s2 = 10000) {
+void setPosVel(float pos_deg, int16_t speed_erpm, int16_t acc_erpm_s2) {
 
   uint32_t can_id = ((uint32_t)CAN_PACKET_SET_POS_SPD << 8) | MOTOR_ID;
 
@@ -70,7 +73,7 @@ void setPosVel(float pos_deg = 0, int16_t speed_erpm = 3000, int16_t acc_erpm_s2
   data[6] = (acc >> 8) & 0xFF;
   data[7] = acc & 0xFF;
 
-  byte result = CAN.sendMsgBuf(can_id, 1, 8, data); // extended frame
+  byte result = CAN.sendMsgBuf(can_id, 1, 8, data);
 
   if (result == CAN_OK) {
     Serial.println("CAN Sent OK");
