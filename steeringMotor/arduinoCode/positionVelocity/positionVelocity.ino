@@ -26,26 +26,6 @@ void setup() {
   Serial.println("CAN Ready");
 }
 
-void loop() {
-
-  // -------- READ SERIAL FROM ROS2 --------
-  if (Serial.available()) {
-    String cmd = Serial.readStringUntil('\n');
-
-    Serial.print("Received: ");
-    Serial.println(cmd);
-
-    if (cmd.startsWith("P")) {
-      target_angle = cmd.substring(2).toFloat();
-    }
-  }
-
-  // -------- CONTINUOUS CONTROL (VERY IMPORTANT) --------
-  setPosVel(target_angle, 8000, 30000);  // stronger + smoother
-
-  delay(20);  // ~50 Hz loop
-}
-
 
 // -------- POSITION + VELOCITY MODE --------
 void setPosVel(float pos_deg, int16_t speed_erpm, int16_t acc_erpm_s2) {
@@ -80,4 +60,26 @@ void setPosVel(float pos_deg, int16_t speed_erpm, int16_t acc_erpm_s2) {
   } else {
     Serial.println("CAN Send FAIL");
   }
+}
+
+void loop() {
+
+  // -------- READ SERIAL FROM ROS2 --------
+  if (Serial.available()) {
+    String cmd = Serial.readStringUntil('\n');
+
+    Serial.print("Received: ");
+    Serial.println(cmd);
+
+    if (cmd.startsWith("P")) {
+      target_angle = cmd.substring(2).toFloat();
+    }
+  }
+
+  // -------- CONTINUOUS CONTROL (VERY IMPORTANT) --------
+  //It is important to note, that AK60-39 will operate at a maximum of 72-73 rpm, which is 72*14 = 1008 erpm max according to the data sheet when put under 18Nm of torque, therefore I have used 1000erpm.
+  //Acceleration is just set to a random-ass high value, because ideally I would like my motor to go to the position immediately
+  setPosVel(target_angle, 1000, 30000);  // stronger + smoother
+
+  delay(20);  // ~50 Hz loop
 }
